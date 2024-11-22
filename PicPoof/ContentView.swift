@@ -2,7 +2,7 @@
 //  ContentView.swift
 //  PicPoof
 //
-//  Created by Aleks Bursac on 2024-11-21.
+//  Created by Aleks Bursac and Anya Popova on 2024-11-21.
 //
 
 import SwiftUI
