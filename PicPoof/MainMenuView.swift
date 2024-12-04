@@ -8,61 +8,57 @@
 import SwiftUI
 import Photos
 
-struct ContentView: View {
+struct MainMenuView: View {
     @State private var photosByYearMonth: [String: [String: [PHAsset]]] = [:]
-    @State private var selectedMonth: String?
-    @State private var selectedPhotos: [PHAsset] = []
+        @State private var selectedMonth: String?
+        @State private var selectedPhotos: [PHAsset] = []
+        @State private var showSwipingView = false
 
-    var body: some View {
-        NavigationView {
-            ScrollView {
-                LazyVStack(spacing: 20) {
-                    ForEach(Array(photosByYearMonth.keys).sorted(by: >), id: \.self) { year in
-                        VStack(alignment: .leading) {                             Text(year)
-                                .font(.headline)
+        var body: some View {
+            NavigationView {
+                ScrollView {
+                    LazyVStack(spacing: 20) {
+                        ForEach(Array(photosByYearMonth.keys).sorted(by: >), id: \.self) { year in
+                            VStack(alignment: .leading) {
+                                Text(year)
+                                    .font(.headline)
 
-                            ScrollView(.horizontal) {
-                                HStack {
-                                    ForEach(Array(photosByYearMonth[year]!.keys).sorted(), id: \.self) { month in
-                                        Button(month) {
-                                            selectedMonth = month
-                                            selectedPhotos = photosByYearMonth[year]?[month] ?? []
+                                ScrollView(.horizontal) {
+                                    HStack {
+                                        ForEach(Array(photosByYearMonth[year]!.keys).sorted(), id: \.self) { month in
+                                            Button(month) {
+                                                selectedMonth = month
+                                                selectedPhotos = photosByYearMonth[year]?[month] ?? []
+                                                showSwipingView = true
+                                            }
                                         }
                                     }
                                 }
                             }
+                            .padding(.horizontal)
                         }
-                        .padding(.horizontal)
                     }
+                    .padding(.top)
                 }
-                .padding(.top)
-
-                if let month = selectedMonth {
-                    ScrollView {
-                        LazyVStack {
-                            ForEach(selectedPhotos, id: \.localIdentifier) { photo in
-                                PhotoThumbnailView(asset: photo)
-                            }
-                        }
-                        .padding()
-                    }
+                .navigationTitle("PicPoof")
+                .onAppear {
+                    fetchPhotosByYearMonth()
                 }
-            }
-            .navigationTitle("PicPoof")
-            .onAppear {
-                fetchPhotosByYearMonth()
+                // this will show a SwipingView for the selected month in a sheet for now
+                // you can refactor it after I make a navbar for SwipingView
+                .sheet(isPresented: $showSwipingView) {
+                    SwipingView(photos: selectedPhotos)
+                }
             }
         }
-    }
+    
 
     func fetchPhotosByYearMonth() {
         PHPhotoLibrary.requestAuthorization { status in
             if status == .authorized {
                 let fetchOptions = PHFetchOptions()
-                fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending:
- false)]
-                let fetchResult = PHAsset.fetchAssets(with: .image, options:
- fetchOptions)
+                fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
+                let fetchResult = PHAsset.fetchAssets(with: .image, options: fetchOptions)
 
                 for i in 0..<fetchResult.count {
                     let asset = fetchResult[i]
@@ -103,7 +99,7 @@ struct PhotoThumbnailView: View {
 
         PHImageManager.default().requestImage(
             for: asset,
-            targetSize: CGSize(width: 200, height: 200),
+            targetSize: CGSize(width: 800, height: 800),
             contentMode: .aspectFit,
             options: options
         ) { (result, _) in
@@ -113,5 +109,5 @@ struct PhotoThumbnailView: View {
 }
 
 #Preview {
-    ContentView()
+    MainMenuView()
 }
