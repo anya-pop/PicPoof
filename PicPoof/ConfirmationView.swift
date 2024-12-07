@@ -11,6 +11,7 @@ import Photos
 struct ConfirmationView: View {
     @Binding var deletionList: Set<String>
     @State var photos: [PHAsset]
+    @Environment(\.dismiss) var dismiss
 
     var body: some View {
         VStack {
@@ -47,6 +48,8 @@ struct ConfirmationView: View {
         // to implement after core bugs are fixed:
             // alert on successful delete and how much storage saved
             // then persist some statistics to coredata
+        dismiss()
+        NotificationCenter.default.post(name: Notification.Name("DismissSwipingView"), object: nil)
         print("Performing deletion for \(deletionList.count) items.")
     }
 }

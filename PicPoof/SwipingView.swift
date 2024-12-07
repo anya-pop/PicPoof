@@ -2,7 +2,7 @@
 //  SwipingView.swift
 //  PicPoof
 //
-//  Created by Aleks Bursac on 2024-12-03.
+//  Created by Aleks Bursac and Anya Popova on 2024-12-03.
 //
 
 import SwiftUI
@@ -14,12 +14,12 @@ struct SwipingView: View {
     @State private var currentPhotoIndex = 0
     @State private var deletionList: Set<String> = []
     @State private var photoOffset: CGFloat = 0
-    @State private var showReviewButton = false
+    @State private var isCompleted = false
 
     var body: some View {
         NavigationView {
             VStack {
-                Text("Photo count: \(photos.count)") // debugging
+                Text("\(currentPhotoIndex + 1)/\(photos.count)") // debugging
                 if currentPhotoIndex < photos.count {
                     PhotoThumbnailView(asset: photos[currentPhotoIndex])
                         .onAppear {
@@ -49,23 +49,23 @@ struct SwipingView: View {
                         }
                         .padding()
                     }
-                } else if showReviewButton {
+                } else {
                     NavigationLink(
                         destination: ConfirmationView(
                             deletionList: $deletionList,
                             photos: photos.filter { deletionList.contains($0.localIdentifier) }
                         ),
+                        isActive: $isCompleted,
                         label: {
                             Text("Review Deletion List")
                         }
                     )
                     .padding()
-                } else {
-                    Text("No more photos.")
-                    Button("Review Deletion List") {
-                        showReviewButton = true
+                    .onAppear {
+                        if currentPhotoIndex >= photos.count {
+                            isCompleted = true
+                        }
                     }
-                    .padding()
                 }
             }
             .navigationBarTitle("SwipingView", displayMode: .inline)
@@ -98,11 +98,7 @@ struct SwipingView: View {
             currentPhotoIndex += 1
         } else {
             currentPhotoIndex += 1
-            showReviewButton = true
+            isCompleted = true
         }
     }
 }
-
-//#Preview {
-//    SwipingView()
-//}

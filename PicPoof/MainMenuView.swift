@@ -10,69 +10,85 @@ import Photos
 
 struct MainMenuView: View {
     @State private var photosByYearMonth: [String: [String: [PHAsset]]] = [:]
-        @State private var selectedMonth: String?
-        @State private var selectedPhotos: [PHAsset] = []
-        @State private var showSwipingView = false
+    @State private var selectedMonth: String?
+    @State private var selectedPhotos: [PHAsset] = []
+    @State private var showSwipingView = false
 
-        var body: some View {
-            NavigationView {
-                ScrollView {
-                    LazyVStack(spacing: 20) {
-                        ForEach(Array(photosByYearMonth.keys).sorted(by: >), id: \.self) { year in
-                            VStack(alignment: .leading) {
-                                Text(year)
-                                    .font(.headline)
+    var body: some View {
+        NavigationView {
+            ScrollView {
+                LazyVStack(spacing: 20) {
+                    ForEach(Array(photosByYearMonth.keys).sorted(by: >), id: \.self) { year in
+                        VStack(alignment: .leading) {
+                            Text(year)
+                                .font(.headline)
 
-                                ScrollView(.horizontal) {
-                                    HStack {
-                                        ForEach(Array(photosByYearMonth[year]!.keys).sorted(), id: \.self) { month in
-                                            Button(month) {
-                                                selectedMonth = month
-                                                selectedPhotos = photosByYearMonth[year]?[month] ?? []
-                                                showSwipingView = true
-                                            }
+                            ScrollView(.horizontal) {
+                                HStack {
+                                    ForEach(Array(photosByYearMonth[year]!.keys).sorted(), id: \.self) { month in
+                                        Button(month) {
+                                            selectedMonth = month
+                                            selectedPhotos = photosByYearMonth[year]?[month] ?? []
+                                            showSwipingView = true
                                         }
                                     }
                                 }
                             }
-                            .padding(.horizontal)
                         }
+                        .padding(.horizontal)
                     }
-                    .padding(.top)
                 }
-                .navigationTitle("PicPoof")
-                .onAppear {
-                    fetchPhotosByYearMonth()
-                }
-                // this will show a SwipingView for the selected month in a sheet for now
-                // you can refactor it after I make a navbar for SwipingView
-                .sheet(isPresented: $showSwipingView) {
-                    SwipingView(photos: selectedPhotos)
-                }
+                .padding(.top)
             }
-        }
-    
-
-    func fetchPhotosByYearMonth() {
-        PHPhotoLibrary.requestAuthorization { status in
-            if status == .authorized {
-                let fetchOptions = PHFetchOptions()
-                fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
-                let fetchResult = PHAsset.fetchAssets(with: .image, options: fetchOptions)
-
-                for i in 0..<fetchResult.count {
-                    let asset = fetchResult[i]
-                    guard let creationDate = asset.creationDate else { continue }
-                    let year = creationDate.formatted(.dateTime.year())
-                    let monthName = creationDate.formatted(.dateTime.month(.wide))
-
-                    photosByYearMonth[year, default: [:]][monthName, default: []].append(asset)
-                }
-            } else {
-                print("Photo library access denied.")
+            .navigationTitle("PicPoof")
+            .onAppear {
+                fetchPhotosByYearMonth()
+            }
+            // this will show a SwipingView for the selected month in a sheet for now
+            // you can refactor it after I make a navbar for SwipingView
+            .sheet(isPresented: $showSwipingView) {
+                SwipingView(photos: selectedPhotos)
+                    .onReceive(NotificationCenter.default.publisher(for: Notification.Name("DismissSwipingView"))) { _ in
+                        showSwipingView = false
+                    }
             }
         }
     }
+    
+    func fetchPhotosByYearMonth() {
+        PHPhotoLibrary.requestAuthorization { status in
+            guard status == .authorized else {
+                print("Photo library access denied.")
+                return
+            }
+            
+            let fetchOptions = PHFetchOptions()
+            fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
+            let fetchResult = PHAsset.fetchAssets(with: .image, options: fetchOptions)
+
+            var tempPhotosByYearMonth: [String: [String: [PHAsset]]] = [:]
+
+            for i in 0..<fetchResult.count {
+                let asset = fetchResult[i]
+                guard let creationDate = asset.creationDate else { continue }
+                let year = creationDate.formatted(.dateTime.year())
+                let month = creationDate.formatted(.dateTime.month(.wide))
+
+                tempPhotosByYearMonth[year, default: [:]][month, default: []].append(asset)
+            }
+
+            DispatchQueue.main.async {
+                photosByYearMonth = tempPhotosByYearMonth
+
+                // preloading first month's photos as a patch
+                if let firstYear = photosByYearMonth.keys.sorted(by: >).first,
+                   let firstMonth = photosByYearMonth[firstYear]?.keys.sorted().first {
+                    selectedPhotos = photosByYearMonth[firstYear]?[firstMonth] ?? []
+                }
+            }
+        }
+    }
+
 }
 
 struct PhotoThumbnailView: View {
