@@ -12,6 +12,8 @@ struct MainMenuView: View {
     @State private var photosByYearMonth: [String: [String: [PHAsset]]] = [:]
     @State private var selectedMonth: String?
     @State private var selectedPhotos: [PHAsset] = []
+    @Environment(\.presentationMode) var presentationMode
+    
 
     var body: some View {
         NavigationView {

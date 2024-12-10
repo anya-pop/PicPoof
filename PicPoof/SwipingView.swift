@@ -9,7 +9,6 @@ import SwiftUI
 import Photos
 
 struct SwipingView: View {
-    @Environment(\.dismiss) var dismiss
     @State var photos: [PHAsset]
     @State private var currentPhotoIndex = 0
     @State private var deletionList: Set<String> = []
@@ -17,59 +16,57 @@ struct SwipingView: View {
     @State private var isCompleted = false
 
     var body: some View {
-        NavigationView {
-            VStack {
-                Text("\(currentPhotoIndex + 1)/\(photos.count)") // debugging
-                if currentPhotoIndex < photos.count {
-                    PhotoThumbnailView(asset: photos[currentPhotoIndex])
-                        .onAppear {
-                            print("SwipingView loaded with \(photos.count) photos")
-                        }
-                        .frame(maxHeight: 400)
-                        .offset(x: photoOffset)
-                        .gesture(
-                            DragGesture()
-                                .onChanged { gesture in
-                                    photoOffset = gesture.translation.width
-                                }
-                                .onEnded { gesture in
-                                    handleSwipe(gesture.translation.width)
-                                }
-                        )
-                        .animation(.spring(), value: photoOffset)
-
-                    HStack {
-                        Button("Delete") {
-                            deleteCurrentPhoto()
-                        }
-                        .padding()
-                        Spacer()
-                        Button("Keep") {
-                            keepCurrentPhoto()
-                        }
-                        .padding()
-                    }
-                } else {
-                    NavigationLink(
-                        destination: ConfirmationView(
-                            deletionList: $deletionList,
-                            photos: photos.filter { deletionList.contains($0.localIdentifier) }
-                        ),
-                        isActive: $isCompleted,
-                        label: {
-                            Text("Review Deletion List")
-                        }
-                    )
-                    .padding()
+        VStack {
+            Text("\(currentPhotoIndex + 1)/\(photos.count)") // debugging
+            if currentPhotoIndex < photos.count {
+                PhotoThumbnailView(asset: photos[currentPhotoIndex])
                     .onAppear {
-                        if currentPhotoIndex >= photos.count {
-                            isCompleted = true
-                        }
+                        print("SwipingView loaded with \(photos.count) photos")
+                    }
+                    .frame(maxHeight: 400)
+                    .offset(x: photoOffset)
+                    .gesture(
+                        DragGesture()
+                            .onChanged { gesture in
+                                photoOffset = gesture.translation.width
+                            }
+                            .onEnded { gesture in
+                                handleSwipe(gesture.translation.width)
+                            }
+                    )
+                    .animation(.spring(), value: photoOffset)
+
+                HStack {
+                    Button("Delete") {
+                        deleteCurrentPhoto()
+                    }
+                    .padding()
+                    Spacer()
+                    Button("Keep") {
+                        keepCurrentPhoto()
+                    }
+                    .padding()
+                }
+            } else {
+                NavigationLink(
+                    destination: ConfirmationView(
+                        deletionList: $deletionList,
+                        photos: photos.filter { deletionList.contains($0.localIdentifier) }
+                    ),
+                    isActive: $isCompleted,
+                    label: {
+                        Text("Review Deletion List")
+                    }
+                )
+                .padding()
+                .onAppear {
+                    if currentPhotoIndex >= photos.count {
+                        isCompleted = true
                     }
                 }
             }
-            .navigationBarTitle("SwipingView", displayMode: .inline)
         }
+        .navigationBarTitle("SwipingView", displayMode: .inline)
     }
 
     // will clean this up to make swiping gesture smoother
