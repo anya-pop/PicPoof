@@ -12,7 +12,6 @@ struct MainMenuView: View {
     @State private var photosByYearMonth: [String: [String: [PHAsset]]] = [:]
     @State private var selectedMonth: String?
     @State private var selectedPhotos: [PHAsset] = []
-    @State private var showSwipingView = false
 
     var body: some View {
         NavigationView {
@@ -20,15 +19,11 @@ struct MainMenuView: View {
                 LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
                     ForEach(Array(photosByYearMonth.keys).sorted(by: >), id: \.self) { year in
                         ForEach(Array(photosByYearMonth[year]!.keys).sorted(), id: \.self) { month in
-                            Button {
-                                selectedMonth = month
-                                selectedPhotos = photosByYearMonth[year]?[month] ?? []
-                                showSwipingView = true
-                            } label: {
+                            NavigationLink(destination: SwipingView(photos: photosByYearMonth[year]?[month] ?? [])) {
                                 Text("\(month.prefix(3).uppercased()) ‘\(year.suffix(2))")
                                     .font(
                                         Font.custom("Montserrat", size: 20)
-                                        .weight(.semibold)
+                                            .weight(.semibold)
                                     )
                                     .foregroundColor(.black)
                                     .padding(.horizontal, 28)
@@ -63,14 +58,6 @@ struct MainMenuView: View {
             .onAppear {
                 fetchPhotosByYearMonth()
             }
-            // this will show a SwipingView for the selected month in a sheet for now
-            // you can refactor it after I make a navbar for SwipingView
-            .sheet(isPresented: $showSwipingView) {
-                SwipingView(photos: selectedPhotos)
-                    .onReceive(NotificationCenter.default.publisher(for: Notification.Name("DismissSwipingView"))) { _ in
-                        showSwipingView = false
-                    }
-            }
         }
     }
     
@@ -96,15 +83,7 @@ struct MainMenuView: View {
                 tempPhotosByYearMonth[year, default: [:]][month, default: []].append(asset)
             }
 
-            DispatchQueue.main.async {
-                photosByYearMonth = tempPhotosByYearMonth
-
-                // preloading first month's photos as a patch
-                if let firstYear = photosByYearMonth.keys.sorted(by: >).first,
-                   let firstMonth = photosByYearMonth[firstYear]?.keys.sorted().first {
-                    selectedPhotos = photosByYearMonth[firstYear]?[firstMonth] ?? []
-                }
-            }
+            photosByYearMonth = tempPhotosByYearMonth
         }
     }
 
