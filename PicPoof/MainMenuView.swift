@@ -17,27 +17,36 @@ struct MainMenuView: View {
     var body: some View {
         NavigationView {
             ScrollView {
-                LazyVStack(spacing: 20) {
+                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
                     ForEach(Array(photosByYearMonth.keys).sorted(by: >), id: \.self) { year in
-                        VStack(alignment: .leading) {
-                            Text(year)
-                                .font(.headline)
-
-                            ScrollView(.horizontal) {
-                                HStack {
-                                    ForEach(Array(photosByYearMonth[year]!.keys).sorted(), id: \.self) { month in
-                                        Button(month) {
-                                            selectedMonth = month
-                                            selectedPhotos = photosByYearMonth[year]?[month] ?? []
-                                            showSwipingView = true
-                                        }
-                                    }
-                                }
+                        ForEach(Array(photosByYearMonth[year]!.keys).sorted(), id: \.self) { month in
+                            Button {
+                                selectedMonth = month
+                                selectedPhotos = photosByYearMonth[year]?[month] ?? []
+                                showSwipingView = true
+                            } label: {
+                                Text("\(month.prefix(3).uppercased()) ‘\(year.suffix(2))")
+                                    .font(.headline)
+                                    .foregroundColor(.black)
+                                    .padding(.horizontal, 28)
+                                    .padding(.vertical, 13)
+                                    .frame(width: 175, height: 55, alignment: .center)
+                                    .background(
+                                        LinearGradient(
+                                            stops: [
+                                                Gradient.Stop(color: Color(red: 0.9, green: 0.79, blue: 1).opacity(0.9), location: 0.00),
+                                                Gradient.Stop(color: Color(red: 0.76, green: 0.52, blue: 1).opacity(0.9), location: 1.00),
+                                            ],
+                                            startPoint: UnitPoint(x: 0, y: 0),
+                                            endPoint: UnitPoint(x: 1, y: 1)
+                                        )
+                                    )
+                                    .cornerRadius(5)
                             }
                         }
-                        .padding(.horizontal)
                     }
                 }
+                .padding(.horizontal)
                 .padding(.top)
             }
             .navigationTitle("PicPoof")
