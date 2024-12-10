@@ -32,13 +32,10 @@ struct MainMenuView: View {
                                     .padding(.vertical, 13)
                                     .frame(width: 175, height: 55, alignment: .center)
                                     .background(
-                                        LinearGradient(
-                                            stops: [
-                                                Gradient.Stop(color: Color(red: 0.9, green: 0.79, blue: 1).opacity(0.9), location: 0.00),
-                                                Gradient.Stop(color: Color(red: 0.76, green: 0.52, blue: 1).opacity(0.9), location: 1.00),
-                                            ],
-                                            startPoint: UnitPoint(x: 0, y: 0),
-                                            endPoint: UnitPoint(x: 1, y: 1)
+                                        MonthGradients.gradients[month] ?? LinearGradient(
+                                            gradient: Gradient(colors: [Color.gray, Color.gray]),
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
                                         )
                                     )
                                     .cornerRadius(5)
