@@ -26,7 +26,10 @@ struct MainMenuView: View {
                                 showSwipingView = true
                             } label: {
                                 Text("\(month.prefix(3).uppercased()) ‘\(year.suffix(2))")
-                                    .font(.headline)
+                                    .font(
+                                        Font.custom("Montserrat", size: 20)
+                                        .weight(.semibold)
+                                    )
                                     .foregroundColor(.black)
                                     .padding(.horizontal, 28)
                                     .padding(.vertical, 13)
@@ -49,7 +52,14 @@ struct MainMenuView: View {
                 .padding(.horizontal)
                 .padding(.top)
             }
-            .navigationTitle("PicPoof")
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Image("picpoof")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(height: 48)
+                }
+            }
             .onAppear {
                 fetchPhotosByYearMonth()
             }

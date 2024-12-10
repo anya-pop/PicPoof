@@ -29,9 +29,22 @@
 		4D2F83AA2CF02A890064E5AA /* PicPoofUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PicPoofUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		4D3084D72D080307009B7A6E /* Exceptions for "PicPoof" folder in "PicPoof" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 4D2F838F2CF02A870064E5AA /* PicPoof */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		4D2F83922CF02A870064E5AA /* PicPoof */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				4D3084D72D080307009B7A6E /* Exceptions for "PicPoof" folder in "PicPoof" target */,
+			);
 			path = PicPoof;
 			sourceTree = "<group>";
 		};
@@ -399,6 +412,7 @@
 				DEVELOPMENT_TEAM = BJPKVK7HFQ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PicPoof/Info.plist;
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "This app requires access to your photos to display them in a gallery.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -429,6 +443,7 @@
 				DEVELOPMENT_TEAM = BJPKVK7HFQ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PicPoof/Info.plist;
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "This app requires access to your photos to display them in a gallery.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
