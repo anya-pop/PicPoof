@@ -37,7 +37,7 @@ struct SwipingView: View {
                                 handleSwipe(gesture.translation.width)
                             }
                     )
-                    .animation(.spring(), value: photoOffset)
+//                    .animation(.spring(), value: photoOffset)
 
                 HStack {
                     Button("DELETE") {
@@ -64,15 +64,23 @@ struct SwipingView: View {
                     ),
                     isActive: $isCompleted,
                     label: {
-                        Text("Review Deletion List")
+                        VStack {
+                            Text("Are you sure?")
+                                .font(Font.custom("Montserrat", size: 24).weight(.semibold))
+                                .foregroundColor(.black)
+                            HStack{
+                                Text("Confirm Deletion")
+                                    .font(Font.custom("Montserrat", size: 20).weight(.semibold))
+                                    .foregroundColor(.green)
+                                Image(systemName: "arrow.right")
+                                        .foregroundColor(.green)
+                                
+                            }
+                        }
+                        
                     }
                 )
                 .padding()
-                .onAppear {
-                    if currentPhotoIndex >= photos.count {
-                        isCompleted = true
-                    }
-                }
             }
         }
         .toolbar {
@@ -95,14 +103,15 @@ struct SwipingView: View {
             }
 
             ToolbarItem(placement: .navigationBarTrailing) {
-                HStack {
+                HStack() {
                     Button(action: undoLastDeletion) {
-                        Text("\(currentPhotoIndex + 1)/\(photos.count)")
+                        Text("\(currentPhotoIndex < photos.count ? currentPhotoIndex + 1 : currentPhotoIndex)/\(photos.count)")
                             .font(Font.custom("Geist", size: 18).weight(.semibold))
                             .foregroundColor(.black)
                         Image(systemName: "arrow.uturn.left")
                             .font(.system(size: 18, weight: .bold))
                             .foregroundColor(.black)
+                            .opacity(currentPhotoIndex == 0 ? 0.25 : 1)
                     }
                 }
             }
@@ -134,11 +143,9 @@ struct SwipingView: View {
         }
     }
     
-
     private func keepCurrentPhoto() {
         moveToNextPhoto()
     }
-    
 
     private func moveToNextPhoto() {
         photoOffset = 0
