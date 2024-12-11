@@ -100,14 +100,15 @@ struct SwipingView: View {
                 NavigationLink(
                     destination: ConfirmationView(
                         deletionList: $deletionList,
-                        photos: photos.filter { deletionList.contains($0.localIdentifier) }
+                        photos: photos.filter { deletionList.contains($0.localIdentifier) },
+                        date: (year: date.year ?? "", month: date.month ?? "")
                     ),
                     isActive: $isCompleted,
                     label: {
                         VStack {
                             Spacer()
-                            Text("Are you sure?")
-                                .font(Font.custom("Montserrat", size: 24).weight(.semibold))
+                            Text("Are you sure? 🤔")
+                                .font(Font.custom("Montserrat", size: 30).weight(.semibold))
                                 .foregroundColor(.black)
                             HStack{
                                 Text("Confirm Deletion")
