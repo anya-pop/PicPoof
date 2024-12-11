@@ -19,6 +19,7 @@ struct SwipingView: View {
 
     var body: some View {
         VStack {
+            Spacer()
             if currentPhotoIndex < photos.count {
                 ZStack {
                     if currentPhotoIndex + 1 < photos.count {
@@ -76,6 +77,7 @@ struct SwipingView: View {
                                 }
                         )
                 }
+                Spacer()
 
                 HStack {
                     Button("DELETE") {
@@ -103,6 +105,7 @@ struct SwipingView: View {
                     isActive: $isCompleted,
                     label: {
                         VStack {
+                            Spacer()
                             Text("Are you sure?")
                                 .font(Font.custom("Montserrat", size: 24).weight(.semibold))
                                 .foregroundColor(.black)
@@ -114,6 +117,7 @@ struct SwipingView: View {
                                         .foregroundColor(.green)
                                 
                             }
+                            Spacer()
                         }
                         
                     }
