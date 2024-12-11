@@ -30,6 +30,16 @@ struct SwipingView: View {
                     .frame(maxHeight: 400)
                     .offset(dragAmount)
                     .rotationEffect(.degrees(Double(dragAmount.width / 10)))
+                    .opacity(1 - min(abs(dragAmount.width) / 300.0, 0.5))
+                    .overlay(
+                        Rectangle()
+                            .fill(dragAmount.width > 0
+                                ? Color.green.opacity(Double(abs(dragAmount.width) / 300.0))
+                                : Color.red.opacity(Double(abs(dragAmount.width) / 300.0)))
+                            .blendMode(.overlay)
+                            .offset(dragAmount)
+                            .rotationEffect(.degrees(Double(dragAmount.width / 10)))
+                    )
                     .gesture(
                         DragGesture()
                             .onChanged {
