@@ -10,18 +10,18 @@ import Photos
 
 struct MainMenuView: View {
     @State private var photosByYearMonth: [String: [String: [PHAsset]]] = [:]
-    @State private var selectedMonth: String?
-    @State private var selectedPhotos: [PHAsset] = []
     @Environment(\.presentationMode) var presentationMode
     
-
     var body: some View {
         NavigationView {
             ScrollView {
                 LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
                     ForEach(Array(photosByYearMonth.keys).sorted(by: >), id: \.self) { year in
                         ForEach(Array(photosByYearMonth[year]!.keys).sorted(), id: \.self) { month in
-                            NavigationLink(destination: SwipingView(photos: photosByYearMonth[year]?[month] ?? [])) {
+                            NavigationLink(destination: SwipingView(
+                                photos: photosByYearMonth[year]?[month] ?? [],
+                                date: (year: year, month: month) 
+                            )) {
                                 Text("\(month.prefix(3).uppercased()) ‘\(year.suffix(2))")
                                     .font(
                                         Font.custom("Montserrat", size: 20)

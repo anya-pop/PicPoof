@@ -9,17 +9,20 @@ import SwiftUI
 import Photos
 
 struct SwipingView: View {
+    @Environment(\.presentationMode) var presentationMode
     @State var photos: [PHAsset]
     @State private var currentPhotoIndex = 0
     @State private var deletionList: Set<String> = []
     @State private var photoOffset: CGFloat = 0
     @State private var isCompleted = false
+    
+    let date: (year: String, month: String)
 
     var body: some View {
         VStack {
-            Text("\(currentPhotoIndex + 1)/\(photos.count)") // debugging
             if currentPhotoIndex < photos.count {
                 PhotoThumbnailView(asset: photos[currentPhotoIndex])
+                    .id(currentPhotoIndex)
                     .onAppear {
                         print("SwipingView loaded with \(photos.count) photos")
                     }
@@ -37,14 +40,20 @@ struct SwipingView: View {
                     .animation(.spring(), value: photoOffset)
 
                 HStack {
-                    Button("Delete") {
+                    Button("DELETE") {
                         deleteCurrentPhoto()
                     }
+                    .font(Font.custom("Montserrat", size: 30).weight(.bold))
+                    .foregroundColor(.black)
                     .padding()
+                    
                     Spacer()
-                    Button("Keep") {
+                    
+                    Button("KEEP") {
                         keepCurrentPhoto()
                     }
+                    .font(Font.custom("Montserrat", size: 32).weight(.bold))
+                    .foregroundColor(.black)
                     .padding()
                 }
             } else {
@@ -66,7 +75,39 @@ struct SwipingView: View {
                 }
             }
         }
-        .navigationBarTitle("SwipingView", displayMode: .inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                HStack {
+                    Button(action: {
+                        presentationMode.wrappedValue.dismiss()
+                    }) {
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: 20, weight: .bold))
+                            .foregroundColor(.black)
+                        Text("\(date.month.prefix(3).uppercased())")
+                            .font(Font.custom("Montserrat", size: 18).weight(.semibold))
+                            .foregroundColor(.black)
+                        Text("'\(date.year.suffix(2))")
+                            .font(Font.custom("Geist", size: 18).weight(.semibold))
+                            .foregroundColor(.black)
+                    }
+                }
+            }
+
+            ToolbarItem(placement: .navigationBarTrailing) {
+                HStack {
+                    Button(action: undoLastDeletion) {
+                        Text("\(currentPhotoIndex + 1)/\(photos.count)")
+                            .font(Font.custom("Geist", size: 18).weight(.semibold))
+                            .foregroundColor(.black)
+                        Image(systemName: "arrow.uturn.left")
+                            .font(.system(size: 18, weight: .bold))
+                            .foregroundColor(.black)
+                    }
+                }
+            }
+        }
+        .navigationBarBackButtonHidden(true)
     }
 
     // will clean this up to make swiping gesture smoother
@@ -79,15 +120,25 @@ struct SwipingView: View {
             photoOffset = 0
         }
     }
+    
 
     private func deleteCurrentPhoto() {
         deletionList.insert(photos[currentPhotoIndex].localIdentifier)
         moveToNextPhoto()
     }
+    
+    private func undoLastDeletion() {
+        if currentPhotoIndex > 0 {
+            currentPhotoIndex -= 1
+            deletionList.remove(photos[currentPhotoIndex].localIdentifier)
+        }
+    }
+    
 
     private func keepCurrentPhoto() {
         moveToNextPhoto()
     }
+    
 
     private func moveToNextPhoto() {
         photoOffset = 0
