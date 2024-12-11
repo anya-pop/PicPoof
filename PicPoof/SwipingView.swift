@@ -14,6 +14,7 @@ struct SwipingView: View {
     @State private var currentPhotoIndex = 0
     @State private var deletionList: Set<String> = []
     @State private var photoOffset: CGFloat = 0
+    @State private var dragAmount = CGSize.zero
     @State private var isCompleted = false
     
     let date: (year: String, month: String)
@@ -27,17 +28,18 @@ struct SwipingView: View {
                         print("SwipingView loaded with \(photos.count) photos")
                     }
                     .frame(maxHeight: 400)
-                    .offset(x: photoOffset)
+                    .offset(dragAmount)
+                    .rotationEffect(.degrees(Double(dragAmount.width / 10)))
                     .gesture(
                         DragGesture()
-                            .onChanged { gesture in
-                                photoOffset = gesture.translation.width
+                            .onChanged {
+                                dragAmount = $0.translation
                             }
                             .onEnded { gesture in
+                                dragAmount = CGSize.zero
                                 handleSwipe(gesture.translation.width)
                             }
                     )
-//                    .animation(.spring(), value: photoOffset)
 
                 HStack {
                     Button("DELETE") {
