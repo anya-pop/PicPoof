@@ -100,7 +100,7 @@ struct SwipingView: View {
                 NavigationLink(
                     destination: ConfirmationView(
                         deletionList: $deletionList,
-                        photos: photos.filter { deletionList.contains($0.localIdentifier) },
+                        photos: photos ,
                         date: (year: date.year ?? "", month: date.month ?? "")
                     ),
                     isActive: $isCompleted,
@@ -175,6 +175,7 @@ struct SwipingView: View {
 
     private func deleteCurrentPhoto() {
         deletionList.insert(photos[currentPhotoIndex].localIdentifier)
+        print(deletionList)
         moveToNextPhoto()
     }
 

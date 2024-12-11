@@ -17,23 +17,38 @@ struct ConfirmationView: View {
     var body: some View {
         VStack {
             ScrollView {
-                LazyVGrid(columns: Array(repeating: GridItem(), count: 3)) {
+                LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 3)) {
                     ForEach(photos, id: \.localIdentifier) { photo in
-                        PhotoThumbnailView(asset: photo)
-                            .overlay(
-                                deletionList.contains(photo.localIdentifier) ?
-                                    Color.blue.opacity(0.5) : Color.clear
-                            )
-                            .onTapGesture {
-                                if deletionList.contains(photo.localIdentifier) {
-                                    deletionList.remove(photo.localIdentifier)
-                                } else {
-                                    deletionList.insert(photo.localIdentifier)
-                                }
+                        ZStack {
+                            PhotoThumbnailView(asset: photo)
+                                .scaledToFill()
+                                .frame(minWidth: 0, maxWidth: .infinity, minHeight: 200)
+                                .clipped()
+                                .overlay(
+                                    deletionList.contains(photo.localIdentifier) ?
+                                        Color.blue.opacity(0.5) : Color.clear
+                                )
+                            if deletionList.contains(photo.localIdentifier) {
+                                Image(systemName: "trash")
+                                    .font(.title)
+                                    .foregroundColor(.white)
                             }
+                        }
+                        .clipped()
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            print(photo.localIdentifier)
+                            if deletionList.contains(photo.localIdentifier) {
+                                deletionList.remove(photo.localIdentifier)
+                            } else {
+                                deletionList.insert(photo.localIdentifier)
+                            }
+                        }
                     }
                 }
+                .padding(.horizontal)
             }
+
             Button {
                 performDeletion()
             } label: {
@@ -79,6 +94,11 @@ struct ConfirmationView: View {
             }
         }
         .navigationBarBackButtonHidden(true)
+//        .onAppear {
+//            print("confirmation view:")
+//            print(photos)
+//            print(deletionList)
+//        }
     }
 
     private func performDeletion() {
