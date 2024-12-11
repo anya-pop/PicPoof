@@ -46,8 +46,27 @@ struct SwipingView: View {
                                 dragAmount = $0.translation
                             }
                             .onEnded { gesture in
-                                dragAmount = CGSize.zero
-                                handleSwipe(gesture.translation.width)
+                                let threshold: CGFloat = 100
+                                let isSwipeRight = gesture.translation.width > threshold
+                                let isSwipeLeft = gesture.translation.width < -threshold
+                                
+                                let offScreenTranslation = CGSize(width: isSwipeRight ? 600 : (isSwipeLeft ? -600 : 0), height: -300)
+                                let offScreenRotation: CGFloat = isSwipeRight ? 30 : (isSwipeLeft ? -30 : 0)
+
+                                if isSwipeRight || isSwipeLeft {
+                                    withAnimation(.easeOut(duration: 0.3)) {
+                                        dragAmount = offScreenTranslation
+                                    }
+
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                        dragAmount = .zero
+                                        handleSwipe(gesture.translation.width)
+                                    }
+                                } else {
+                                    withAnimation {
+                                        dragAmount = .zero
+                                    }
+                                }
                             }
                     )
 
