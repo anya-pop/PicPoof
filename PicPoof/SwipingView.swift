@@ -15,8 +15,7 @@ struct SwipingView: View {
     @State private var deletionList: Set<String> = []
     @State private var dragAmount = CGSize.zero
     @State private var isCompleted = false
-    
-    let date: (year: String, month: String)
+    let date: (year: String?, month: String?)
 
     var body: some View {
         VStack {
@@ -131,12 +130,15 @@ struct SwipingView: View {
                         Image(systemName: "chevron.left")
                             .font(.system(size: 20, weight: .bold))
                             .foregroundColor(.black)
-                        Text("\(date.month.prefix(3).uppercased())")
-                            .font(Font.custom("Montserrat", size: 18).weight(.semibold))
-                            .foregroundColor(.black)
-                        Text("'\(date.year.suffix(2))")
-                            .font(Font.custom("Geist", size: 18).weight(.semibold))
-                            .foregroundColor(.black)
+
+                        if let month = date.month, let year = date.year {
+                            Text("\(month.prefix(3).uppercased())")
+                                .font(Font.custom("Montserrat", size: 18).weight(.semibold))
+                                .foregroundColor(.black)
+                            Text("'\(year.suffix(2))")
+                                .font(Font.custom("Geist", size: 18).weight(.semibold))
+                                .foregroundColor(.black)
+                        }
                     }
                 }
             }
@@ -158,7 +160,6 @@ struct SwipingView: View {
         .navigationBarBackButtonHidden(true)
     }
 
-    // will clean this up to make swiping gesture smoother
     private func handleSwipe(_ width: CGFloat) {
         if width < -100 {
             deleteCurrentPhoto()
@@ -166,13 +167,12 @@ struct SwipingView: View {
             keepCurrentPhoto()
         }
     }
-    
 
     private func deleteCurrentPhoto() {
         deletionList.insert(photos[currentPhotoIndex].localIdentifier)
         moveToNextPhoto()
     }
-    
+
     private func undoLastDeletion() {
         if currentPhotoIndex > 0 {
             currentPhotoIndex -= 1
@@ -193,3 +193,4 @@ struct SwipingView: View {
         }
     }
 }
+

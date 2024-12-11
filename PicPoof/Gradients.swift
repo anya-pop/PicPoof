@@ -1,5 +1,5 @@
 //
-//  MonthGradients.swift
+//  Gradients.swift
 //  PicPoof
 //
 //  Created by Anya Popova on 2024-12-10.
@@ -7,7 +7,7 @@
 import SwiftUI
 import Foundation
 
-struct MonthGradients {
+struct Gradients {
     static let gradients: [String: LinearGradient] = [
         "January": LinearGradient(
             stops: [
@@ -104,6 +104,33 @@ struct MonthGradients {
             ],
             startPoint: UnitPoint(x: 0, y: 0),
             endPoint: UnitPoint(x: 1, y: 1)
+        ),
+        
+        "Flashbacks": LinearGradient(
+            stops: [
+            Gradient.Stop(color: Color(red: 0.78, green: 0.84, blue: 1), location: 0.00),
+            Gradient.Stop(color: Color(red: 0.57, green: 0.69, blue: 1), location: 1.00),
+            ],
+            startPoint: UnitPoint(x: 0, y: 0.5),
+            endPoint: UnitPoint(x: 1, y: 0.5)
+        ),
+        
+        "Recents": LinearGradient(
+            stops: [
+            Gradient.Stop(color: Color(red: 1, green: 0.79, blue: 0.79), location: 0.00),
+            Gradient.Stop(color: Color(red: 1, green: 0.64, blue: 0.64), location: 1.00),
+            ],
+            startPoint: UnitPoint(x: 0, y: 0.5),
+            endPoint: UnitPoint(x: 1, y: 0.5)
+        ),
+        
+        "Random": LinearGradient(
+            stops: [
+            Gradient.Stop(color: Color(red: 1, green: 0.91, blue: 0.79), location: 0.00),
+            Gradient.Stop(color: Color(red: 1, green: 0.86, blue: 0.68), location: 1.00),
+            ],
+            startPoint: UnitPoint(x: 0, y: 0.5),
+            endPoint: UnitPoint(x: 1, y: 0.5)
         ),
     ]
 }
