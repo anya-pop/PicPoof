@@ -9,7 +9,9 @@ import SwiftUI
 import Photos
 
 struct SwipingView: View {
+    @Environment(\.rootPresentationMode) var rootPresentationMode
     @Environment(\.presentationMode) var presentationMode
+    @Environment(\.dismiss) private var dismiss
     @State var photos: [PHAsset]
     @State private var currentPhotoIndex = 0
     @State private var deletionList: Set<String> = []
@@ -31,9 +33,6 @@ struct SwipingView: View {
                     
                     PhotoThumbnailView(asset: photos[currentPhotoIndex])
                         .id(currentPhotoIndex)
-                        .onAppear {
-                            print("SwipingView loaded with \(photos.count) photos")
-                        }
                         .frame(maxHeight: 600)
                         .offset(dragAmount)
                         .rotationEffect(.degrees(Double(dragAmount.width / 10)))
@@ -58,7 +57,7 @@ struct SwipingView: View {
                                     let isSwipeLeft = gesture.translation.width < -threshold
                                     
                                     let offScreenTranslation = CGSize(width: isSwipeRight ? 600 : (isSwipeLeft ? -600 : 0), height: -300)
-                                    let offScreenRotation: CGFloat = isSwipeRight ? 30 : (isSwipeLeft ? -30 : 0)
+//                                    let offScreenRotation: CGFloat = isSwipeRight ? 30 : (isSwipeLeft ? -30 : 0)
                                     
                                     if isSwipeRight || isSwipeLeft {
                                         withAnimation(.easeOut(duration: 0.3)) {
@@ -126,6 +125,10 @@ struct SwipingView: View {
                 .padding()
             }
         }
+        .onReceive(NotificationCenter.default.publisher(for: Notification.Name("DismissSwipingView"))) { _ in
+            print("dismissing VIEW")
+            presentationMode.wrappedValue.dismiss()
+        }
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 HStack {
@@ -175,7 +178,6 @@ struct SwipingView: View {
 
     private func deleteCurrentPhoto() {
         deletionList.insert(photos[currentPhotoIndex].localIdentifier)
-        print(deletionList)
         moveToNextPhoto()
     }
 

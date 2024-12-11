@@ -9,13 +9,14 @@ import SwiftUI
 import Photos
 
 struct MainMenuView: View {
+    @Environment(\.rootPresentationMode) var rootPresentationMode
+    @Environment(\.presentationMode) var presentationMode
     @State private var photosByYearMonth: [String: [String: [PHAsset]]] = [:]
     @State private var recentPhotos: [PHAsset] = []
     @State private var randomPhotos: [PHAsset] = []
     @State private var showSwipingView = false
     @State private var selectedPhotos: [PHAsset] = []
     @State private var selectedDate: (year: String?, month: String?)? = nil
-    @Environment(\.presentationMode) var presentationMode
     
     var body: some View {
         NavigationView {
@@ -138,8 +139,11 @@ struct MainMenuView: View {
                     isActive: $showSwipingView,
                     label: { EmptyView() }
                 )
+                .isDetailLink(false)
             )
         }
+        .navigationViewStyle(.stack)
+        .environment(\.rootPresentationMode, self.$showSwipingView)
     }
     
     func fetchPhotosByYearMonth() {

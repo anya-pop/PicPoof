@@ -9,9 +9,11 @@ import SwiftUI
 import Photos
 
 struct ConfirmationView: View {
+    @Environment(\.rootPresentationMode) var rootPresentationMode
+    @Environment(\.presentationMode) var presentationMode
+    @Environment(\.dismiss) private var dismiss
     @Binding var deletionList: Set<String>
     @State var photos: [PHAsset]
-    @Environment(\.presentationMode) var presentationMode
     let date: (year: String?, month: String?)
 
     var body: some View {
@@ -37,7 +39,6 @@ struct ConfirmationView: View {
                         .clipped()
                         .contentShape(Rectangle())
                         .onTapGesture {
-                            print(photo.localIdentifier)
                             if deletionList.contains(photo.localIdentifier) {
                                 deletionList.remove(photo.localIdentifier)
                             } else {
@@ -102,13 +103,11 @@ struct ConfirmationView: View {
     }
 
     private func performDeletion() {
-        // to implement after core bugs are fixed:
-            // alert on successful delete and how much storage saved
-            // then persist some statistics to coredata
-//        dismiss()
-//        NotificationCenter.default.post(name: Notification.Name("DismissSwipingView"), object: nil)
-        presentationMode.wrappedValue.dismiss()
+        // alert on successful delete and how much storage saved
+        // then persist some statistics to coredata
         print("Performing deletion for \(deletionList.count) items.")
+        NotificationCenter.default.post(name: Notification.Name("DismissSwipingView"), object: nil)
+        presentationMode.wrappedValue.dismiss()
     }
 }
 
