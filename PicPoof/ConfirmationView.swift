@@ -72,6 +72,7 @@ struct ConfirmationView: View {
                     .stroke(.black, lineWidth: 1)
             )
         }
+        .padding(.bottom, 32)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 HStack {

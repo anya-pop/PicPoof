@@ -141,6 +141,7 @@ struct SwipingView: View {
                           .weight(.medium)
                       )
                       .foregroundColor(.black)
+                      .padding(.top, 4)
                     
                     Spacer()
                    
@@ -150,7 +151,7 @@ struct SwipingView: View {
                                 .weight(.medium)
                         )
                         .foregroundColor(.black)
-                    
+                        .padding(.top, 4)
                     Button("KEEP") {
                         keepCurrentPhoto()
                     }
@@ -158,6 +159,7 @@ struct SwipingView: View {
                     .foregroundColor(.black)
                     .padding(.trailing)
                 }
+                .padding(.bottom, 32)
             } else {
                 NavigationLink(
                     destination: ConfirmationView(
