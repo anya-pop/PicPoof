@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Photos
+import CoreLocation
 
 struct SwipingView: View {
     @Environment(\.rootPresentationMode) var rootPresentationMode
@@ -17,13 +18,23 @@ struct SwipingView: View {
     @State private var deletionList: Set<String> = []
     @State private var dragAmount = CGSize.zero
     @State private var dragging: Bool = false
-    @State private var showOverlay: Bool = false
-    @State private var photoInfo = "Photo info"
-    @State private var blurAmount: CGFloat = 0
     @State private var photoInfoOpacity = 0.0
+    @State private var blurAmount: CGFloat = 0
+    @State private var showOverlay: Bool = false
+    @State private var photoDate = "Photo date"
+    @State private var photoLocation = "Photo location"
     
     @State private var isCompleted = false
     let date: (year: String?, month: String?)
+    
+    func daySuffix(from day: Int) -> String {
+        switch day {
+        case 1, 21, 31: return "st"
+        case 2, 22: return "nd"
+        case 3, 23: return "rd"
+        default: return "th"
+        }
+    }
 
     var body: some View {
         VStack {
@@ -40,6 +51,7 @@ struct SwipingView: View {
                     PhotoThumbnailView(asset: photos[currentPhotoIndex])
                         .id(currentPhotoIndex)
                         .frame(maxHeight: 600)
+                        .scaledToFit()
                         .offset(dragAmount)
                         .rotationEffect(.degrees(Double(dragAmount.width / 10)))
                         .opacity(1 - min(abs(dragAmount.width) / 600.0, 0.5))
@@ -47,34 +59,36 @@ struct SwipingView: View {
                         .overlay(
                             ZStack {
                                 if showOverlay {
-                                    Text(photoInfo)
-                                        .font(Font.custom("Montserrat", size: 18).weight(.semibold))
-                                        .foregroundColor(.white)
-                                        .padding()
-                                        .background(Color.black.opacity(0.7))
-                                        .cornerRadius(10)
-                                        .offset(dragAmount)
-                                        .rotationEffect(.degrees(Double(dragAmount.width / 10)))
-                                        .opacity(photoInfoOpacity)
-                                            .onAppear {
-                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                                    withAnimation(.easeIn(duration: 0.2)) {
-                                                        if dragging {
-                                                            photoInfoOpacity = 1.0
-                                                            blurAmount = 2
-                                                        }
-                                                    }
+                                    VStack(alignment: .leading) {
+                                        Text(photoDate)
+                                        Text(photoLocation)
+                                    }
+                                    .multilineTextAlignment(.leading)
+                                    .font(Font.custom("Montserrat", size: 18).weight(.semibold))
+                                    .foregroundColor(.white)
+                                    .padding()
+                                    .background(Color.black.opacity(0.7))
+                                    .cornerRadius(10)
+                                    .offset(dragAmount)
+                                    .rotationEffect(.degrees(Double(dragAmount.width / 10)))
+                                    .opacity(photoInfoOpacity)
+                                    .onAppear {
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                            withAnimation(.easeIn(duration: 0.2)) {
+                                                if dragging {
+                                                    photoInfoOpacity = 1.0
+                                                    blurAmount = 2
                                                 }
                                             }
-                                            .onDisappear {
-                                                DispatchQueue.main.async {
-                                                    photoInfoOpacity = 0.0
-                                                    blurAmount = 0
-                                                    dragging = false
-                                                }
-                                            }
-                                            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
-                                        .padding([.leading], 16)
+                                        }
+                                    }
+                                    .onDisappear {
+                                        DispatchQueue.main.async {
+                                            photoInfoOpacity = 0.0
+                                            blurAmount = 0
+                                            dragging = false
+                                        }
+                                    }
                                 }
                                 Rectangle()
                                     .fill(dragAmount.width > 0
@@ -84,6 +98,31 @@ struct SwipingView: View {
                                     .offset(dragAmount)
                                     .rotationEffect(.degrees(Double(dragAmount.width / 10)))
                             }
+                            .onAppear {
+                                if let creationDate = photos[currentPhotoIndex].creationDate {
+                                    let day = Calendar.current.component(.day, from: creationDate)
+                                    let daySuffix = daySuffix(from: day)
+                                    let dateFormatter = DateFormatter()
+                                    dateFormatter.dateFormat = "MMM d'\(daySuffix)', yyyy"
+                                    photoDate = dateFormatter.string(from: creationDate)
+                                } else {
+                                    photoDate = "Unknown date 😵‍💫"
+                                }
+                                
+                                if let location = photos[currentPhotoIndex].location {
+                                    let geocoder = CLGeocoder()
+                                    geocoder.reverseGeocodeLocation(location) { placemarks, error in
+                                        if let placemark = placemarks?.first {
+                                            let address = "\(placemark.thoroughfare ?? ""), \(placemark.locality ?? ""), \(placemark.country ?? "")"
+                                            photoLocation = "Photo taken at \(address)"
+                                        } else {
+                                            photoLocation = "Unknown location 😵‍💫"
+                                        }
+                                    }
+                                } else {
+                                    photoLocation = "Unknown location 😵‍💫"
+                                }
+                            }
                         )
                         .gesture(
                             DragGesture()
@@ -91,7 +130,6 @@ struct SwipingView: View {
                                     dragging = true
                                     dragAmount = $0.translation
                                     showOverlay = true
-                                    photoInfo = "Photo taken at \(photos[currentPhotoIndex].creationDate?.formatted() ?? "Unknown date")"
                                     
                                 }
                                 .onEnded { gesture in
@@ -107,7 +145,6 @@ struct SwipingView: View {
                                     let isSwipeLeft = gesture.translation.width < -threshold
                                     
                                     let offScreenTranslation = CGSize(width: isSwipeRight ? 600 : (isSwipeLeft ? -600 : 0), height: -300)
-//                                    let offScreenRotation: CGFloat = isSwipeRight ? 30 : (isSwipeLeft ? -30 : 0)
                                     
                                     if isSwipeRight || isSwipeLeft {
                                         withAnimation(.easeOut(duration: 0.3)) {

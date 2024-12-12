@@ -420,7 +420,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = PicPoof/Info.plist;
-				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "This app requires access to your photos to display them in a gallery.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "PicPoof needs location access to display the location where your photos were taken.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -451,7 +451,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = PicPoof/Info.plist;
-				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "This app requires access to your photos to display them in a gallery.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "PicPoof needs location access to display the location where your photos were taken.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
