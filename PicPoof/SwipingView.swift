@@ -271,8 +271,12 @@ struct SwipingView: View {
                             .font(.system(size: 20, weight: .bold))
                             .foregroundColor(.black)
 
-                        if let month = date.month, let year = date.year {
+                        if let month = date.month, !month.isEmpty, let year = date.year, !year.isEmpty {
                             Text("\(month.prefix(3).uppercased()) '\(year.suffix(2))")
+                                .font(Font.custom("Geist", size: 18).weight(.semibold))
+                                .foregroundColor(.black)
+                        } else {
+                            Text("Back") 
                                 .font(Font.custom("Geist", size: 18).weight(.semibold))
                                 .foregroundColor(.black)
                         }
