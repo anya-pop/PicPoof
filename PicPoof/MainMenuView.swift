@@ -19,6 +19,7 @@ struct MainMenuView: View {
     @State private var selectedPhotos: [PHAsset] = []
     @State private var selectedDate: (year: String?, month: String?)? = nil
     @State private var reverseMonthOrder = false
+    @StateObject private var vm = CoreDataViewModel()
     
     let viewContext = PersistenceController.shared.container.viewContext
     
@@ -152,16 +153,19 @@ struct MainMenuView: View {
                                                 )
                                             )
                                             .cornerRadius(5)
-                                        //                                            .overlay(
-                                        //                                                        Image("scribble")
-                                        //                                                            .renderingMode(.template)
-                                        //                                                            .resizable()
-                                        //                                                            .scaleEffect(0.7)
-                                        //                                                            .opacity(0.5)
-                                        //                                                            .frame(width: 175, height: 55)
-                                        //                                                            .foregroundColor(.black)
-                                        //                                                            .scaleEffect(x: Bool.random() ? -1 : 1, y: Bool.random() ? -1 : 1)
-                                        //                                                )
+                                            .overlay(
+                                                vm.monthProgressList.first(where: { $0.year == year && $0.month == month })?.isCompleted == true ?
+                                                Image("scribble")
+                                                    .renderingMode(.template)
+                                                    .resizable()
+                                                    .scaleEffect(0.7)
+                                                    .opacity(0.5)
+                                                    .scaledToFit()
+                                                    .frame(width: 175, height: 55)
+                                                    .foregroundColor(.black)
+                                                    .scaleEffect(x: Bool.random() ? -1 : 1, y: Bool.random() ? -1 : 1)
+                                                : nil
+                                            )
                                     }
                                 }
                             }
@@ -193,6 +197,12 @@ struct MainMenuView: View {
                 )
                 .isDetailLink(false)
             )
+        }
+        .onAppear {
+            vm.fetchMonthProgress()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: Notification.Name("MonthCompleted"))) { _ in
+            vm.fetchMonthProgress() 
         }
         .navigationViewStyle(.stack)
         .environment(\.rootPresentationMode, self.$showSwipingView)
@@ -337,6 +347,15 @@ struct PersistenceController {
             }
         })
         container.viewContext.automaticallyMergesChangesFromParent = true
+    }
+}
+extension MonthProgress {
+    static func fetchRequest(year: String, month: String) -> FetchRequest<MonthProgress> {
+        FetchRequest(
+            entity: MonthProgress.entity(),
+            sortDescriptors: [],
+            predicate: NSPredicate(format: "year == %@ AND month == %@", year, month)
+        )
     }
 }
 

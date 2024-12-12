@@ -8,11 +8,15 @@
 import SwiftUI
 import Photos
 import CoreLocation
+import CoreData
+import Foundation
 
 struct SwipingView: View {
     @Environment(\.rootPresentationMode) var rootPresentationMode
     @Environment(\.presentationMode) var presentationMode
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.managedObjectContext) private var viewContext
+    
     @State var photos: [PHAsset]
     @State private var currentPhotoIndex = 0
     @State private var deletionList: Set<String> = []
@@ -26,6 +30,8 @@ struct SwipingView: View {
     @State private var photoSize = "Photo size"
     
     @State private var isCompleted = false
+    @StateObject private var vm = CoreDataViewModel()
+
     let date: (year: String?, month: String?)
     
     func daySuffix(from day: Int) -> String {
@@ -37,6 +43,7 @@ struct SwipingView: View {
         }
     }
 
+    
     var body: some View {
         VStack {
             Spacer()
@@ -311,12 +318,22 @@ struct SwipingView: View {
     }
 
     private func moveToNextPhoto() {
-        if currentPhotoIndex < photos.count - 1 {
-            currentPhotoIndex += 1
-        } else {
-            currentPhotoIndex += 1
-            isCompleted = true
+            if currentPhotoIndex < photos.count - 1 {
+                currentPhotoIndex += 1
+            } else {
+                currentPhotoIndex += 1
+                isCompleted = true
+                markMonthAsCompleted()
+            }
         }
-    }
+    
+    private func markMonthAsCompleted() {
+            guard let year = date.year, let month = date.month else { return }
+            vm.markMonthAsCompleted(year: year, month: month)
+        
+        NotificationCenter.default.post(name: Notification.Name("MonthCompleted"), object: nil)
+            print("markMonthAsCompleted() called for \(year ?? "unknown year") \(month ?? "unknown month")")
+
+        }
 }
 
