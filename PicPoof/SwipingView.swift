@@ -60,37 +60,39 @@ struct SwipingView: View {
                         .overlay(
                             ZStack {
                                 if showOverlay {
-                                    VStack(alignment: .leading) {
-                                        Text(photoDate)
-                                        Text(photoLocation)
-                                        Text(photoSize)
-                                    }
-                                    .multilineTextAlignment(.leading)
-                                    .font(Font.custom("Geist", size: 18).weight(.semibold))
-                                    .foregroundColor(.white)
-                                    .padding()
-                                    .background(Color.black.opacity(0.7))
-                                    .cornerRadius(10)
-                                    .offset(dragAmount)
-                                    .rotationEffect(.degrees(Double(dragAmount.width / 10)))
-                                    .opacity(photoInfoOpacity)
-                                    .onAppear {
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                            withAnimation(.easeIn(duration: 0.2)) {
-                                                if dragging {
-                                                    photoInfoOpacity = 1.0
-                                                    blurAmount = 2
+                                    VStack() {
+                                        VStack(alignment: .leading) {
+                                            Text(photoDate)
+                                            Text(photoLocation)
+                                            Text(photoSize)
+                                        }
+                                        .multilineTextAlignment(.leading)
+                                        .font(Font.custom("Geist", size: 18).weight(.semibold))
+                                        .foregroundColor(.white)
+                                        .padding()
+                                        .background(Color.black.opacity(0.7))
+                                        .cornerRadius(10)
+                                        .offset(dragAmount)
+                                        .rotationEffect(.degrees(Double(dragAmount.width / 10)))
+                                        .opacity(photoInfoOpacity)
+                                        .onAppear {
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                                withAnimation(.easeIn(duration: 0.2)) {
+                                                    if dragging {
+                                                        photoInfoOpacity = 1.0
+                                                        blurAmount = 2
+                                                    }
                                                 }
                                             }
                                         }
-                                    }
-                                    .onDisappear {
-                                        DispatchQueue.main.async {
-                                            photoInfoOpacity = 0.0
-                                            blurAmount = 0
-                                            dragging = false
+                                        .onDisappear {
+                                            DispatchQueue.main.async {
+                                                photoInfoOpacity = 0.0
+                                                blurAmount = 0
+                                                dragging = false
+                                            }
                                         }
-                                    }
+                                    }.padding(.top, 172)
                                 }
                                 Rectangle()
                                     .fill(dragAmount.width > 0
@@ -115,8 +117,14 @@ struct SwipingView: View {
                                     let geocoder = CLGeocoder()
                                     geocoder.reverseGeocodeLocation(location) { placemarks, error in
                                         if let placemark = placemarks?.first {
-                                            let address = "\(placemark.thoroughfare ?? ""), \(placemark.locality ?? ""), \(placemark.country ?? "")"
-                                            photoLocation = "Photo taken at \(address)"
+                                            let country = placemark.country ?? ""
+                                            let city = placemark.locality ?? ""
+                                            
+                                            if !city.isEmpty {
+                                                photoLocation = "\(city), \(country)"
+                                            } else {
+                                                photoLocation = country
+                                            }
                                         } else {
                                             photoLocation = "Unknown location 😵‍💫"
                                         }
