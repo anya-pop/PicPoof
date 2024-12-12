@@ -1,7 +1,11 @@
 //
 //  DeletionView.swift
 //  PicPoof
-//
+//  991 694 498
+//  991 683 351
+//  Anya Popova
+//  Aleks Bursac
+//  PROG31975
 //  Created by Aleks Bursac and Anya Popova on 2024-12-03.
 //
 
