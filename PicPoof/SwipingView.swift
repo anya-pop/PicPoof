@@ -23,6 +23,7 @@ struct SwipingView: View {
     @State private var showOverlay: Bool = false
     @State private var photoDate = "Photo date"
     @State private var photoLocation = "Photo location"
+    @State private var photoSize = "Photo size"
     
     @State private var isCompleted = false
     let date: (year: String?, month: String?)
@@ -62,9 +63,10 @@ struct SwipingView: View {
                                     VStack(alignment: .leading) {
                                         Text(photoDate)
                                         Text(photoLocation)
+                                        Text(photoSize)
                                     }
                                     .multilineTextAlignment(.leading)
-                                    .font(Font.custom("Montserrat", size: 18).weight(.semibold))
+                                    .font(Font.custom("Geist", size: 18).weight(.semibold))
                                     .foregroundColor(.white)
                                     .padding()
                                     .background(Color.black.opacity(0.7))
@@ -121,6 +123,16 @@ struct SwipingView: View {
                                     }
                                 } else {
                                     photoLocation = "Unknown location 😵‍💫"
+                                }
+                                
+                                let options = PHContentEditingInputRequestOptions()
+                                photos[currentPhotoIndex].requestContentEditingInput(with: options) { input, _ in
+                                    if let url = input?.fullSizeImageURL, let fileSize = try? FileManager.default.attributesOfItem(atPath: url.path)[.size] as? Int {
+                                        let sizeInMB = Double(fileSize) / (1024 * 1024)
+                                        photoSize = String(format: "%.2f MB", sizeInMB)
+                                    } else {
+                                        photoSize = "Unknown size"
+                                    }
                                 }
                             }
                         )
@@ -228,7 +240,6 @@ struct SwipingView: View {
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: Notification.Name("DismissSwipingView"))) { _ in
-            print("dismissing VIEW")
             presentationMode.wrappedValue.dismiss()
         }
         .toolbar {
@@ -242,10 +253,7 @@ struct SwipingView: View {
                             .foregroundColor(.black)
 
                         if let month = date.month, let year = date.year {
-                            Text("\(month.prefix(3).uppercased())")
-                                .font(Font.custom("Montserrat", size: 18).weight(.semibold))
-                                .foregroundColor(.black)
-                            Text("'\(year.suffix(2))")
+                            Text("\(month.prefix(3).uppercased()) '\(year.suffix(2))")
                                 .font(Font.custom("Geist", size: 18).weight(.semibold))
                                 .foregroundColor(.black)
                         }
