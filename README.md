@@ -2,6 +2,14 @@
 **Group #2**:
 Aleksandar Bursac, Anya Popova
 
+## Submission
+We accomplished many of the core functionalities proposed for our MVP. As per the requirements: we used core data to track the completed months and reflect them the UI, and we used location services for geocoding and formatting photo locations. We added many desirable functionalities such as different gestures for the SwipingView: the tap gesture which is instant, and the drag gesture which has a smooth, user-friendly animation and reveals important and condensed information about the photos on hold. We've made a performant application capable of dealing with a great amount of photos of all sizes, and tested on several devices to ensure a consistent user experience and error handling.
+
+![PicPoof main menu](https://github.com/aleksbrsc/PicPoof/blob/main/pp_mainmenu.png?raw=true)
+![PicPoof swipe hold 1](https://github.com/aleksbrsc/PicPoof/blob/main/pp_swipehold1.png?raw=true)
+![PicPoof swipe hold 2](https://github.com/aleksbrsc/PicPoof/blob/main/pp_swipehold2.png?raw=true)
+![PicPoof confirmation view](https://github.com/aleksbrsc/PicPoof/blob/main/pp_confview.png?raw=true)
+
 ## Proposal
 ### Project Overview
 A few paragraphs describing the purpose of the application and development environment:
