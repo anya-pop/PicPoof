@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		8BC8810E2D0A5EE2000CFAF5 /* PicPoofModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 8BC8810C2D0A5EE2000CFAF5 /* PicPoofModel.xcdatamodeld */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		4D2F83A12CF02A890064E5AA /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -27,6 +31,7 @@
 		4D2F83902CF02A870064E5AA /* PicPoof.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PicPoof.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4D2F83A02CF02A890064E5AA /* PicPoofTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PicPoofTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4D2F83AA2CF02A890064E5AA /* PicPoofUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PicPoofUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		8BC8810D2D0A5EE2000CFAF5 /* PicPoofModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = PicPoofModel.xcdatamodel; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -88,6 +93,7 @@
 		4D2F83872CF02A870064E5AA = {
 			isa = PBXGroup;
 			children = (
+				8BC8810C2D0A5EE2000CFAF5 /* PicPoofModel.xcdatamodeld */,
 				4D2F83922CF02A870064E5AA /* PicPoof */,
 				4D2F83A32CF02A890064E5AA /* PicPoofTests */,
 				4D2F83AD2CF02A890064E5AA /* PicPoofUITests */,
@@ -249,6 +255,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8BC8810E2D0A5EE2000CFAF5 /* PicPoofModel.xcdatamodeld in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -575,6 +582,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		8BC8810C2D0A5EE2000CFAF5 /* PicPoofModel.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				8BC8810D2D0A5EE2000CFAF5 /* PicPoofModel.xcdatamodel */,
+			);
+			currentVersion = 8BC8810D2D0A5EE2000CFAF5 /* PicPoofModel.xcdatamodel */;
+			path = PicPoofModel.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 4D2F83882CF02A870064E5AA /* Project object */;
 }

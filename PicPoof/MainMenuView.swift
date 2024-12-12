@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Photos
+import CoreData
 
 struct MainMenuView: View {
     @Environment(\.rootPresentationMode) var rootPresentationMode
@@ -17,6 +18,15 @@ struct MainMenuView: View {
     @State private var showSwipingView = false
     @State private var selectedPhotos: [PHAsset] = []
     @State private var selectedDate: (year: String?, month: String?)? = nil
+    @State private var reverseMonthOrder = false
+    
+    let viewContext = PersistenceController.shared.container.viewContext
+    
+    private let dateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMMM"
+        return formatter
+    }()
     
     var body: some View {
         NavigationView {
@@ -86,37 +96,79 @@ struct MainMenuView: View {
                             .cornerRadius(10)
                         }
                     }
-                    .padding()
+                    .padding(.horizontal)
+                    .padding(.top)
+                    .padding(.bottom, 8)
                     
-                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
-                        ForEach(Array(photosByYearMonth.keys).sorted(by: >), id: \.self) { year in
-                            ForEach(Array(photosByYearMonth[year]!.keys).sorted(), id: \.self) { month in
-                                NavigationLink(
-                                    destination: SwipingView(
-                                        photos: photosByYearMonth[year]?[month] ?? [],
-                                        date: (year: year, month: month)
-                                    )
-                                ) {
-                                    Text("\(month.prefix(3).uppercased()) ‘\(year.suffix(2))")
-                                        .font(Font.custom("Montserrat", size: 20).weight(.semibold))
-                                        .foregroundColor(.black)
-                                        .padding(.horizontal, 28)
-                                        .padding(.vertical, 13)
-                                        .frame(width: 175, height: 55, alignment: .center)
-                                        .background(
-                                            Gradients.gradients[month] ?? LinearGradient(
-                                                gradient: Gradient(colors: [Color.gray, Color.gray]),
-                                                startPoint: .topLeading,
-                                                endPoint: .bottomTrailing
-                                            )
+                    Rectangle()
+                        .foregroundColor(.clear)
+                        .frame(width: 316, height: 1)
+                        .background(Color(red: 0.93, green: 0.93, blue: 0.93))
+                        .padding(.bottom, 10)
+                    
+                    
+                    VStack(spacing: 10) {
+                        HStack {
+                            Button(action: {
+                                reverseMonthOrder.toggle()
+                            }) {
+                                Text(reverseMonthOrder ? "Oldest first" : "Most recent")
+                                    .font(.headline)
+                                    .foregroundColor(.black)
+                            }
+                            Spacer()
+                        }
+                        .padding(.horizontal, 20)
+                        .padding(.bottom, -15)
+                        
+                        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
+                            ForEach(Array(photosByYearMonth.keys).sorted(by: {
+                                reverseMonthOrder ? $0 < $1 : $0 > $1
+                            }), id: \.self) { year in
+                                ForEach(Array(photosByYearMonth[year]!.keys).sorted(by: {
+                                    guard let date1 = dateFormatter.date(from: $0),
+                                          let date2 = dateFormatter.date(from: $1) else {
+                                        return false
+                                    }
+                                    return reverseMonthOrder ? date1 < date2 : date1 > date2
+                                }), id: \.self) { month in
+                                    NavigationLink(
+                                        destination: SwipingView(
+                                            photos: photosByYearMonth[year]?[month] ?? [],
+                                            date: (year: year, month: month)
                                         )
-                                        .cornerRadius(5)
+                                    ) {
+                                        Text("\(month.prefix(3).uppercased()) ‘\(year.suffix(2))")
+                                            .font(Font.custom("Montserrat", size: 20).weight(.semibold))
+                                            .foregroundColor(.black)
+                                            .padding(.horizontal, 28)
+                                            .padding(.vertical, 13)
+                                            .frame(width: 175, height: 55, alignment: .center)
+                                            .background(
+                                                Gradients.gradients[month] ?? LinearGradient(
+                                                    gradient: Gradient(colors: [Color.gray, Color.gray]),
+                                                    startPoint: .topLeading,
+                                                    endPoint: .bottomTrailing
+                                                )
+                                            )
+                                            .cornerRadius(5)
+                                        //                                            .overlay(
+                                        //                                                        Image("scribble")
+                                        //                                                            .renderingMode(.template)
+                                        //                                                            .resizable()
+                                        //                                                            .scaleEffect(0.7)
+                                        //                                                            .opacity(0.5)
+                                        //                                                            .frame(width: 175, height: 55)
+                                        //                                                            .foregroundColor(.black)
+                                        //                                                            .scaleEffect(x: Bool.random() ? -1 : 1, y: Bool.random() ? -1 : 1)
+                                        //                                                )
+                                    }
                                 }
                             }
                         }
+                        .padding(.horizontal)
+                        .padding(.top)
                     }
-                    .padding(.horizontal)
-                    .padding(.top)
                 }
             }
             .toolbar {
@@ -233,7 +285,7 @@ struct MainMenuView: View {
             showSwipingView = true
         }
     }
-
+    
 }
 
 struct PhotoThumbnailView: View {
@@ -266,6 +318,25 @@ struct PhotoThumbnailView: View {
         ) { (result, _) in
             self.image = result
         }
+    }
+}
+
+struct PersistenceController {
+    static let shared = PersistenceController()
+    
+    let container: NSPersistentContainer
+    
+    init(inMemory: Bool = false) {
+        container = NSPersistentContainer(name: "PicPoofModel")
+        if inMemory {
+            container.persistentStoreDescriptions.first!.url = URL(fileURLWithPath: "/dev/null")
+        }
+        container.loadPersistentStores(completionHandler: { (storeDescription, error) in
+            if let error = error as NSError? {
+                fatalError("Unresolved error \(error), \(error.userInfo)")
+            }
+        })
+        container.viewContext.automaticallyMergesChangesFromParent = true
     }
 }
 
