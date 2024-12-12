@@ -84,10 +84,7 @@ struct ConfirmationView: View {
                             .foregroundColor(.black)
 
                         if let month = date.month, let year = date.year {
-                            Text("\(month.prefix(3).uppercased())")
-                                .font(Font.custom("Montserrat", size: 18).weight(.semibold))
-                                .foregroundColor(.black)
-                            Text("'\(year.suffix(2))")
+                            Text("\(month.prefix(3).uppercased()) '\(year.suffix(2))")
                                 .font(Font.custom("Geist", size: 18).weight(.semibold))
                                 .foregroundColor(.black)
                         }
@@ -104,12 +101,34 @@ struct ConfirmationView: View {
     }
 
     private func performDeletion() {
-        // alert on successful delete and how much storage saved
-        // then persist some statistics to coredata
         print("Performing deletion for \(deletionList.count) items.")
-        NotificationCenter.default.post(name: Notification.Name("DismissSwipingView"), object: nil)
-        presentationMode.wrappedValue.dismiss()
+        
+        if deletionList.isEmpty {
+            NotificationCenter.default.post(name: Notification.Name("DismissSwipingView"), object: nil)
+            presentationMode.wrappedValue.dismiss()
+            return print("Nothing to delete.")
+        }
+        let photosToDelete = photos.filter { deletionList.contains($0.localIdentifier) }
+        
+        PHPhotoLibrary.shared().performChanges({
+            PHAssetChangeRequest.deleteAssets(photosToDelete as NSArray)
+        }) { success, error in
+            if success {
+                self.photos.removeAll { photo in
+                    photosToDelete.contains { $0.localIdentifier == photo.localIdentifier }
+                }
+                print("Deletion successful.")
+            } else {
+                print("Error deleting photos: \(String(describing: error))")
+            }
+            
+            DispatchQueue.main.async {
+                NotificationCenter.default.post(name: Notification.Name("DismissSwipingView"), object: nil)
+                presentationMode.wrappedValue.dismiss()
+            }
+        }
     }
+
 }
 
 //#Preview {
